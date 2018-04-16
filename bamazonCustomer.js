@@ -1,7 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 var productsArray = [];
-var stockArray = [];
+
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -42,11 +42,8 @@ function pushItems() {
     connection.query("SELECT * FROM products", function (err, res) {
         for (i = 0; i < res.length; i++) {
             productsArray.push(res[i].id)
-            stockArray.push(res[i].stock_quantity)
         }
-        // console.log(productsArray)
     })
-
 }
 
 
@@ -59,7 +56,7 @@ function buy() {
             {
                 name: "action",
                 type: "list",
-                message: "Would you like to continue something? ",
+                message: "Would you like to continue shopping?",
                 choices: ["yes", "no"],
             }
         ])
@@ -115,12 +112,12 @@ function selectItem() {
                 ]).then(function(answers){
                     // console.log(answer);
                     // console.log(answers)
-                    var val = res[0].stock_quantity - answers.stock_quantity
+                    var val = parseInt(res[0].stock_quantity) - parseInt(answers.stock_quantity)
                     var cost = res[0].price * answers.stock_quantity
                     // console.log(val)
                     connection.query("UPDATE `products` SET stock_quantity = ? WHERE ?", [val, answer], function(err, res){
                         if (err) throw err;
-                        console.log("You have " + val + " units left of that item.") 
+                        // console.log("You have " + val + " units left of that item.") 
                         console.log("Yor total was $" + cost.toFixed(2) + ", thank you for shopping with us!")
                         buy();
 
