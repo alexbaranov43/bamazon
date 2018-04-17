@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require("cli-table");
 var productsArray = [];
 
 
@@ -22,16 +23,24 @@ connection.connect(function (err) {
 
 
 function showItems() {
+    var table = new Table({
+        head: ['ID', 'Product_Name', 'Department', 'Price', 'Stock_Quantity']
+        ,colWidths: [30, 30, 30, 30, 30]
+    });
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         console.log("Welcome to Bamazon! Here is our current inventory.")
         for (i = 0; i < res.length; i++) {
-            console.log('\nID: ' + res[i].id
-                + '\r\nProduct: ' + res[i].product_name
-                + '\r\nDepartment: ' + res[i].department_name
-                + '\r\nPrice: $' + res[i].price
-                + '\r\nStock: ' + res[i].stock_quantity)
+            table.push(
+                [res[i].id, res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity]
+            );
+        //     console.log('\nID: ' + res[i].id
+        //         + '\r\nProduct: ' + res[i].product_name
+        //         + '\r\nDepartment: ' + res[i].department_name
+        //         + '\r\nPrice: $' + res[i].price
+        //         + '\r\nStock: ' + res[i].stock_quantity)
         }
+        console.log(table.toString());
         buy();
     })
 }
