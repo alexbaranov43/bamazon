@@ -88,13 +88,68 @@ function createDepartment() {
                     }
                     return true
                 }
-            }
+            },
         ]).then(function (answer) {
             connection.query("INSERT INTO `departments`(`department_name`, `over_head_costs`) VALUES (?, ?)", [answer.department_name, answer.over_head_costs], function (err, val) {
                 if (err) throw err;
                 console.log(answer.department_name + " was added")
-                supervisor()
+                function addProduct() {
+                    inquire
+                        .prompt([
+                            {
+                                name: "product_name",
+                                type: "input",
+                                message: "Enter new product to the department:"
+                            },
+                            {
+                                name: "price",
+                                type: "input",
+                                message: "MSRP:",
+                                validate: function (value) {
+                                    if (isNaN(value) === false && parseInt(value) > 0) {
+                                        return true;
+                                    }
+                                    return false;
+                                }
+                            },
+                            {
+                                name: "stock_quantity",
+                                type: "input",
+                                message: "Quantity:",
+                                validate: function (value) {
+                                    if (isNaN(value) === false && parseInt(value) > 0) {
+                                        return true;
+                                    }
+                                    return false;
+                                }
+                            }
+                        ]).then(function (answers) {
+                            connection.query("INSERT INTO `products`(`product_name`, `department_name`, `price`, `stock_quantity`) VALUES (?, ?, ?, ?)", [answers.product_name, answer.department_name, answers.price, answers.stock_quantity], function (err, val) {
+                                if (err) throw err;
+                                inquire.prompt([
+                                    {
+                                        name: "action",
+                                        type: "list",
+                                        message: "Would you like to add another item to this department?",
+                                        choices: ["Yes", "No"]
+                                    }
+                                ]).then(function(answer){
+                                    switch(answer.action){
+                                        case "Yes":
+                                        addProduct();
+                                        break;
+
+                                        case "No":
+                                        supervisor();
+                                        break;
+                                    }
+                                })
+                                
+                            })
+                        })
+                }
+                addProduct();
             })
         })
-
 }
+

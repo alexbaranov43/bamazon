@@ -1,6 +1,7 @@
 var mysql = require("mysql")
 var inquirer = require("inquirer")
 var productsArray = [];
+var departmentsArray = [];
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -18,6 +19,7 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     pushItems();
+
 });
 
 manager();
@@ -89,6 +91,7 @@ function lowInventory() {
 }
 
 function addInventory() {
+
     inquirer
         .prompt([
             {
@@ -169,6 +172,7 @@ function continuePrompt() {
 }
 
 function addNewItem() {
+    pushDepartments()
     inquirer
         .prompt([
             {
@@ -180,16 +184,7 @@ function addNewItem() {
                 name: "department_name",
                 type: "list",
                 message: "Select the department",
-                choices: [
-                    "Electronics",
-                    "Literature",
-                    "Clothing",
-                    "Musical Instrument",
-                    "Produce",
-                    "Toys",
-                    "Household Appliances",
-                    "Miscellaneous"
-                ]
+                choices: departmentsArray
             },
             {
                 name: "price",
@@ -213,8 +208,8 @@ function addNewItem() {
                     return false;
                 }
             }
-        ]).then(function(answer){
-            connection.query("INSERT INTO `products`(`product_name`, `department_name`, `price`, `stock_quantity`) VALUES (?, ?, ?, ?)", [answer.product_name, answer.department_name, answer.price, answer.stock_quantity], function(err, val){
+        ]).then(function (answer) {
+            connection.query("INSERT INTO `products`(`product_name`, `department_name`, `price`, `stock_quantity`) VALUES (?, ?, ?, ?)", [answer.product_name, answer.department_name, answer.price, answer.stock_quantity], function (err, val) {
                 console.log("Congratuations on adding a new item to your inventory!")
                 continuePrompt()
             })
@@ -228,4 +223,13 @@ function pushItems() {
         }
     })
 }
+
+function pushDepartments() {
+    connection.query("SELECT products.department_name FROM departments LEFT JOIN products ON departments.department_name = products.department_name GROUP BY department_id", function (err, res) {
+        for (j = 0; j < res.length; j++) {
+            departmentsArray.push(res[j].department_name)
+        }
+    })
+}
+
 
