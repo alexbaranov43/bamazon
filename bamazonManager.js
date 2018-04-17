@@ -186,6 +186,7 @@ function addNewItem() {
                     "Clothing",
                     "Musical Instrument",
                     "Produce",
+                    "Toys",
                     "Household Appliances",
                     "Miscellaneous"
                 ]
@@ -215,13 +216,11 @@ function addNewItem() {
         ]).then(function(answer){
             connection.query("INSERT INTO `products`(`product_name`, `department_name`, `price`, `stock_quantity`) VALUES (?, ?, ?, ?)", [answer.product_name, answer.department_name, answer.price, answer.stock_quantity], function(err, val){
                 console.log("Congratuations on adding a new item to your inventory!")
-                continuePrompt(as)
+                continuePrompt()
             })
         })
 
 }
-
-
 function pushItems() {
     connection.query("SELECT * FROM products", function (err, res) {
         for (i = 0; i < res.length; i++) {

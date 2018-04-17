@@ -34,7 +34,6 @@ function showItems() {
         }
         buy();
     })
-    // connection.end()
 }
 showItems();
 
@@ -109,20 +108,26 @@ function selectItem() {
 
                         }
                     }
-                ]).then(function(answers){
+                ]).then(function (answers) {
                     // console.log(answer);
                     // console.log(answers)
                     var val = parseInt(res[0].stock_quantity) - parseInt(answers.stock_quantity)
                     var cost = res[0].price * answers.stock_quantity
+                    var productSales = parseInt(res[0].product_sales) + parseInt(cost)
                     // console.log(val)
-                    connection.query("UPDATE `products` SET stock_quantity = ? WHERE ?", [val, answer], function(err, res){
+                    connection.query("UPDATE `products` SET stock_quantity = ? WHERE ?", [val, answer], function (err, res) {
                         if (err) throw err;
                         // console.log("You have " + val + " units left of that item.") 
                         console.log("Yor total was $" + cost.toFixed(2) + ", thank you for shopping with us!")
+
+                        connection.query("UPDATE `products` SET product_sales = ? WHERE ?", [productSales, answer], function (err, res) {
+                            if (err) throw err;
+
+                        })
                         buy();
 
                     })
-                    
+
                 })
             })
         })
